@@ -54,7 +54,7 @@ export function ProjectSummaryView() {
       }
 
       reset()
-      router.push('/dashboard')
+      router.push(`/project/${result.projectId}`)
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {

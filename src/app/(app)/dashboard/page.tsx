@@ -98,41 +98,38 @@ export default async function DashboardPage() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
-  const artifactCount = 0 // Will be populated with real count in Phase 3
-
   return (
-    <ForgeCard interactive className="flex flex-col">
-      <ForgeCardHeader>
-        <ForgeCardTitle className="line-clamp-1">{project.name}</ForgeCardTitle>
-        {artifactCount > 0 && (
-          <StatusChip variant="accent">{artifactCount} artifacts</StatusChip>
+    <Link href={`/project/${project.id}`} className="block">
+      <ForgeCard interactive className="flex flex-col">
+        <ForgeCardHeader>
+          <ForgeCardTitle className="line-clamp-1">{project.name}</ForgeCardTitle>
+        </ForgeCardHeader>
+
+        {project.description && (
+          <ForgeCardDescription className="line-clamp-2 flex-1">
+            {project.description}
+          </ForgeCardDescription>
         )}
-      </ForgeCardHeader>
 
-      {project.description && (
-        <ForgeCardDescription className="line-clamp-2 flex-1">
-          {project.description}
-        </ForgeCardDescription>
-      )}
+        {project.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-3">
+            {project.tags.slice(0, 3).map((tag) => (
+              <StatusChip key={tag} variant="default">
+                {tag}
+              </StatusChip>
+            ))}
+            {project.tags.length > 3 && (
+              <StatusChip variant="default">+{project.tags.length - 3}</StatusChip>
+            )}
+          </div>
+        )}
 
-      {project.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {project.tags.slice(0, 3).map((tag) => (
-            <StatusChip key={tag} variant="default">
-              {tag}
-            </StatusChip>
-          ))}
-          {project.tags.length > 3 && (
-            <StatusChip variant="default">+{project.tags.length - 3}</StatusChip>
-          )}
-        </div>
-      )}
-
-      <ForgeCardFooter>
-        <span className="text-forge-xs text-[var(--color-fg-subtle)]">
-          {formatRelativeTime(project.updated_at)}
-        </span>
-      </ForgeCardFooter>
-    </ForgeCard>
+        <ForgeCardFooter>
+          <span className="text-forge-xs text-[var(--color-fg-subtle)]">
+            {formatRelativeTime(project.updated_at)}
+          </span>
+        </ForgeCardFooter>
+      </ForgeCard>
+    </Link>
   )
 }
