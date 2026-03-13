@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { createServerClient } from '@/lib/supabase/server'
 import type { Project } from '@/types'
 import { ForgeCard, ForgeCardHeader, ForgeCardTitle, ForgeCardDescription, ForgeCardFooter } from '@/components/forge/ForgeCard'
@@ -43,7 +44,9 @@ export default async function DashboardPage() {
               : `${projectList.length} project${projectList.length === 1 ? '' : 's'}`}
           </p>
         </div>
-        <ForgeButton variant="primary">New Project</ForgeButton>
+        <Link href="/new-project">
+          <ForgeButton variant="primary">New Project</ForgeButton>
+        </Link>
       </div>
 
       {/* Error state */}
@@ -74,9 +77,11 @@ export default async function DashboardPage() {
             Describe a project once. PromptForge generates your PRD, architecture spec, Claude Code
             kickoff prompt, and more.
           </p>
-          <ForgeButton variant="primary" size="lg">
-            Create your first project
-          </ForgeButton>
+          <Link href="/new-project">
+            <ForgeButton variant="primary" size="lg">
+              Create your first project
+            </ForgeButton>
+          </Link>
         </div>
       )}
 
