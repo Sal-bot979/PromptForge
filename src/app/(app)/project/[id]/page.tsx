@@ -4,7 +4,8 @@ import { createServerClient } from '@/lib/supabase/server'
 import { ArtifactGrid } from '@/components/features/ArtifactGeneration'
 import { StatusChip } from '@/components/forge/StatusChip'
 import { formatRelativeTime } from '@/lib/utils'
-import type { ArtifactType, Project, Artifact } from '@/types'
+import { listStyleProfilesAction } from '@/app/(app)/styles/actions'
+import type { ArtifactType, Project } from '@/types'
 
 interface ProjectPageProps {
   params: Promise<{ id: string }>
@@ -48,6 +49,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     .eq('project_id', id)
 
   const savedArtifacts = (artifacts ?? []) as Array<{ type: ArtifactType; content: string }>
+
+  // Load style profiles (seeds built-ins if user has none yet) + active profile pref in parallel
+  const [styleResult, prefsResult] = await Promise.all([
+    listStyleProfilesAction(),
+    supabase
+      .from('user_preferences')
+      .select('active_style_profile_id')
+      .eq('user_id', user!.id)
+      .maybeSingle(),
+  ])
+  const styleProfiles = 'data' in styleResult ? styleResult.data : []
+  const activeProfileId = prefsResult.data?.active_style_profile_id ?? null
 
   const typedProject = project as Project
 
@@ -120,6 +133,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         projectContext={projectContext}
         projectId={id}
         savedArtifacts={savedArtifacts}
+        profiles={styleProfiles}
+        activeProfileId={activeProfileId}
       />
     </div>
   )

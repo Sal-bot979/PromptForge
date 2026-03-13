@@ -1,8 +1,9 @@
 import { create } from 'zustand'
 import type { ArtifactType, GenerationStatus } from '@/types'
 import { ARTIFACT_TYPE_ORDER } from '@/types'
-import type { GenerateRequest, ProjectContext, StyleProfileContext } from '@/lib/claude/types'
+import type { GenerateRequest, ProjectContext } from '@/lib/claude/types'
 import type { StreamChunkPayload } from '@/lib/claude/types'
+import { useStyleStore, resolveStyleForArtifact } from '@/store/styleStore'
 
 // ─── State types ──────────────────────────────────────────────────────────────
 
@@ -147,12 +148,7 @@ export async function runArtifactGeneration(
 ): Promise<void> {
   store.startGeneration(type)
 
-  // Default style profile — Phase 4 will wire up user's active profile
-  const styleProfile: StyleProfileContext = {
-    styleType: 'structured',
-    rules: [],
-    learnedOverrides: [],
-  }
+  const styleProfile = resolveStyleForArtifact(type, useStyleStore.getState())
 
   const body: GenerateRequest = {
     artifactType: type,

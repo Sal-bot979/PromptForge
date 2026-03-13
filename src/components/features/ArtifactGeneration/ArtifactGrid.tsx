@@ -5,8 +5,9 @@ import { useGenerationStore } from '@/store/generationStore'
 import { ArtifactCard } from './ArtifactCard'
 import { GenerateAllButton } from './GenerateAllButton'
 import { MarkdownStyles } from './MarkdownPreview'
+import { StyleStoreInitializer, StyleSelector } from '@/components/features/StyleEngine'
 import { ARTIFACT_TYPE_ORDER } from '@/types'
-import type { ArtifactType } from '@/types'
+import type { ArtifactType, StyleProfile } from '@/types'
 import type { ProjectContext } from '@/lib/claude/types'
 
 interface ArtifactGridProps {
@@ -14,6 +15,10 @@ interface ArtifactGridProps {
   projectId: string
   /** Artifacts already saved in Supabase — hydrates the store on mount */
   savedArtifacts: Array<{ type: ArtifactType; content: string }>
+  /** Style profiles for this user — passed to StyleStoreInitializer */
+  profiles: StyleProfile[]
+  /** The user's currently active style profile ID */
+  activeProfileId: string | null
 }
 
 /**
@@ -22,7 +27,13 @@ interface ArtifactGridProps {
  * Initializes the generation store from saved artifacts on mount,
  * so revisiting a project shows previously generated content immediately.
  */
-export function ArtifactGrid({ projectContext, projectId, savedArtifacts }: ArtifactGridProps) {
+export function ArtifactGrid({
+  projectContext,
+  projectId,
+  savedArtifacts,
+  profiles,
+  activeProfileId,
+}: ArtifactGridProps) {
   const initFromSaved = useGenerationStore((s) => s.initFromSaved)
   const storeProjectId = useGenerationStore((s) => s.projectId)
 
@@ -38,6 +49,9 @@ export function ArtifactGrid({ projectContext, projectId, savedArtifacts }: Arti
       {/* Inject markdown preview styles once */}
       <MarkdownStyles />
 
+      {/* Hydrate style store from server-loaded props */}
+      <StyleStoreInitializer profiles={profiles} activeProfileId={activeProfileId} />
+
       {/* Header row */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -46,7 +60,10 @@ export function ArtifactGrid({ projectContext, projectId, savedArtifacts }: Arti
             {ARTIFACT_TYPE_ORDER.length} document types · Generate individually or all at once
           </p>
         </div>
-        <GenerateAllButton projectContext={projectContext} projectId={projectId} />
+        <div className="flex items-center gap-3">
+          <StyleSelector />
+          <GenerateAllButton projectContext={projectContext} projectId={projectId} />
+        </div>
       </div>
 
       {/* 2-column grid */}
